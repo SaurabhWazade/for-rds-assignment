@@ -15,7 +15,7 @@ pipeline {
                     git clone https://github.com/SaurabhWazade/project.git
 
                     cd /mnt/servers/apache-tomcat-10.1.49/webapps/
-                    rm -rf LoginWebApp* || true
+                    rm -rf LoginWebApp LoginWebApp.war || true
                     """
                 }
             }
@@ -32,33 +32,34 @@ pipeline {
         stage ('extract war file') {
             steps {
                 sh """
-                cd /mnt/
-                rm -rf test || true
-                mkdir test
-                cd test/
-                mkdir LoginWebApp
-                cd LoginWebApp/
-                cp -r /mnt/project/target/LoginWebApp.war .
+                rm -rf /mnt/test || true
+                mkdir /mnt/test
+
+                cd /mnt/test
+                cp /mnt/project/target/LoginWebApp.war .
+
+                # Extract cleanly
                 unzip LoginWebApp.war
-                rm -rf LoginWebApp.war
+
+                # Remove original WAR
+                rm -f LoginWebApp.war
                 """
             }
         }
 
         stage ('edit userregistration file') {
             steps {
-                dir ('/mnt/test/LoginWebApp') {
+                dir('/mnt/test') {
                     sh """
                     sed -i 's|"jdbc:mysql://localhost:3306/test", "root", "root"|"jdbc:mysql://database-1.cl2ge2kg8jsb.ap-south-1.rds.amazonaws.com:3306/test", "admin", "ratan1234"|g' userRegistration.jsp
-                    cd ..
-                    zip -r LoginWebApp.war LoginWebApp
-                    rm -rf LoginWebApp
+
+                    # Rebuild a proper WAR (no nesting)
+                    zip -r LoginWebApp.war META-INF WEB-INF *.jsp
+
                     cp LoginWebApp.war /mnt/servers/apache-tomcat-10.1.49/webapps/
                     """
                 }
             }
         }
-
     }
-
 }
