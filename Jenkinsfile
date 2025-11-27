@@ -46,7 +46,7 @@ pipeline {
 
         stage ('edit userregistration file') {
             steps {
-                dir('/mnt/test/LoginWebApp') {
+                dir('/mnt/test/) {
                     sh """
                     sed -i 's|"jdbc:mysql://localhost:3306/test", "root", "root"|"jdbc:mysql://database-1.cl2ge2kg8jsb.ap-south-1.rds.amazonaws.com:3306/test", "admin", "ratan1234"|g' userRegistration.jsp
                     
