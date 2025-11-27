@@ -36,7 +36,8 @@ pipeline {
                 rm -rf test || true
                 mkdir test
                 cd test/
-
+                mkdir LoginWebApp
+                cd LoginWebApp/
                 cp -r /mnt/project/target/LoginWebApp.war .
                 unzip LoginWebApp.war
                 rm -rf LoginWebApp.war
@@ -49,8 +50,9 @@ pipeline {
                 dir ('/mnt/test/LoginWebApp') {
                     sh """
                     sed -i 's|"jdbc:mysql://localhost:3306/test", "root", "root"|"jdbc:mysql://database-1.cl2ge2kg8jsb.ap-south-1.rds.amazonaws.com:3306/test", "admin", "ratan1234"|g' userRegistration.jsp
-                    
-                    zip -r LoginWebApp.war *
+                    cd ..
+                    zip -r LoginWebApp.war LoginWebApp
+                    rm -rf LoginWebApp
                     cp LoginWebApp.war /mnt/servers/apache-tomcat-10.1.49/webapps/
                     """
                 }
