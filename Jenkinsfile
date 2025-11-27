@@ -8,7 +8,10 @@ stages {
 stage ('git clone') {
 steps {
 dir ('/mnt/') {
-sh " git clone https://github.com/SaurabhWazade/project.git"
+sh """ rm -rf project || true
+  git clone https://github.com/SaurabhWazade/project.git
+  cd /mnt/servers/apache-tomcat-10.1.49/webapps/
+  rm -rf LoginWebApp* || true"""
 }
 }
 }
@@ -21,7 +24,10 @@ sh "mvn clean package"
 }
 stage ('extract war file') {
 steps {
-sh """ cd /mnt/test/
+sh """cd /mnt/
+rm -rf test || true
+mkdir test
+cd test/
 cp -r /mnt/project/target/LoginWebApp.war .
 unzip LoginWebApp.war
 rm -rf LoginWebApp.war """
